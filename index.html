@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MekongAir Citizen Pulse — UNDP Youth Digital Citizen Challenge 2026</title>
+  <meta name="description" content="MekongAir Citizen Pulse: Nền tảng Công dân Số phân tích dữ liệu AQI/PM2.5 thời gian thực ĐBSCL/Cần Thơ & Việt Nam, đối chiếu chuẩn kép VN_AQI (1459/QĐ-TCMT) & US EPA 2024, dự báo 24h Conformal AI & báo cáo cộng đồng." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#18d2ba" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
+            <path d="M9.6 4.6A2 2 0 1 1 11 8H2" />
+            <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">
+            MekongAir Citizen Pulse
+            <span class="brand-badge">UNDP YDCC 2026 · MVP</span>
+          </h1>
+          <p id="brandSubText" class="brand-sub">
+            Nền tảng Công dân Số Phân tích Dữ liệu Không khí, Cảnh báo Phơi nhiễm &amp; Dự báo AI — ĐBSCL &amp; Việt Nam
+          </p>
+        </div>
+      </div>
+
+      <div class="topbar-controls">
+        <div class="live-pill">
+          <span class="pulse-dot"></span>
+          <span id="liveStatusText">MÔ PHỎNG ĐỐI CHỨNG ĐÃ KIỂM CHỨNG</span>
+        </div>
+        <button type="button" id="exportGeoJsonBtn" class="btn">Xuất Open Data (.GeoJSON)</button>
+        <button type="button" id="langToggleBtn" class="lang-btn">🌐 EN / VI</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Official UNDP YDCC 2026 Baseline & Model Verification Strip -->
+    <section class="impact-strip" aria-label="Bối cảnh quốc gia và chỉ số kiểm chứng">
+      <div class="stat-tile warn">
+        <div id="s1Kicker" class="stat-kicker">PM2.5 TRUNG BÌNH VN (UNDP)</div>
+        <div class="stat-val">28.7 µg/m³</div>
+        <div id="s1Desc" class="stat-desc">Cao gấp 5.7× ngưỡng khuyến nghị năm của WHO (5 µg/m³)</div>
+      </div>
+      <div class="stat-tile danger">
+        <div id="s2Kicker" class="stat-kicker">GÁNH NẶNG SỨC KHỎE &amp; KINH TẾ</div>
+        <div class="stat-val">70,000+ ca/năm</div>
+        <div id="s2Desc" class="stat-desc">Thiệt hại ~13 tỷ USD/năm (~4% GDP Việt Nam)</div>
+      </div>
+      <div class="stat-tile">
+        <div id="s3Kicker" class="stat-kicker">ĐỘ CHÍNH XÁC DỰ BÁO 24H</div>
+        <div class="stat-val">RMSE 3.47 µg/m³</div>
+        <div id="s3Desc" class="stat-desc">Giảm 79.9% sai số so với Persistence (Độ phủ 90.8% PI)</div>
+      </div>
+      <div class="stat-tile">
+        <div id="s4Kicker" class="stat-kicker">MẠNG LƯỚI QUAN TRẮC &amp; DÂN SINH</div>
+        <div class="stat-val">12 Trạm · FAIR</div>
+        <div id="s4Desc" class="stat-desc">Tích hợp chuẩn kép VN_AQI (1459/QĐ-TCMT) &amp; US EPA 2024</div>
+      </div>
+    </section>
+
+    <!-- Primary Row: Interactive Map + Dual-Standard AQI Inspector -->
+    <section class="hero-grid">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="mapTitle" class="card-title">Bản đồ Không khí &amp; Điểm nóng Phơi nhiễm Thời gian thực</h2>
+            <p id="mapSub" class="card-subtitle">Nhấp chọn trạm tại Cần Thơ / ĐBSCL hoặc đô thị lớn để phân tích chuyên sâu</p>
+          </div>
+        </div>
+
+        <div class="filter-row" role="tablist">
+          <button type="button" id="fAllBtn" class="chip-btn active" data-region="all">Toàn quốc (12 trạm)</button>
+          <button type="button" id="fMekongBtn" class="chip-btn" data-region="mekong">ĐBSCL &amp; Cần Thơ (9 trạm)</button>
+          <button type="button" id="fNationalBtn" class="chip-btn" data-region="national">Hà Nội · Đà Nẵng · TP.HCM</button>
+        </div>
+
+        <div class="map-wrap">
+          <div id="leafletMap"></div>
+          <div id="fallbackSvgMap" style="display:none;"></div>
+          <div class="map-legend">
+            <span class="legend-item"><span class="legend-swatch" style="background:#1bc47d;"></span>0–50 Tốt</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#facc15;"></span>51–100 TB</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#fb923c;"></span>101–150 Nhạy cảm</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#ef4444;"></span>151–200 Xấu</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#a855f7;"></span>201+ Rất xấu</span>
+            <span class="legend-item"><span class="legend-swatch" style="background:#f59e0b;border-radius:50%;"></span>⚑ Báo cáo dân sinh</span>
+          </div>
+        </div>
+
+        <div id="stationStrip" class="station-strip" aria-label="Danh sách trạm quan trắc"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="inspTitle" class="card-title">Đối chiếu Quy chuẩn Kép &amp; Hiệu chuẩn Độ ẩm ĐBSCL</h2>
+            <p id="selectedStationHeading" style="margin:6px 0 2px;font-weight:800;color:var(--brand-cyan);font-size:1rem;">
+              Ninh Kiều — TP. Cần Thơ
+            </p>
+            <p id="selectedStationNote" class="card-subtitle"></p>
+          </div>
+        </div>
+
+        <div class="dual-aqi-grid">
+          <div class="aqi-gauge-box">
+            <div class="gauge-label">
+              <span>VN_AQI</span>
+              <span style="font-family:var(--font-mono);opacity:0.75;">QĐ 1459/QĐ-TCMT</span>
+            </div>
+            <div id="vnAqiNum" class="gauge-num">--</div>
+            <div id="vnAqiCat" class="gauge-cat">--</div>
+          </div>
+
+          <div class="aqi-gauge-box">
+            <div class="gauge-label">
+              <span>US EPA 2024</span>
+              <span style="font-family:var(--font-mono);opacity:0.75;">40 CFR Pt.58</span>
+            </div>
+            <div id="usAqiNum" class="gauge-num">--</div>
+            <div id="usAqiCat" class="gauge-cat">--</div>
+          </div>
+        </div>
+
+        <div id="blindSpotBanner" class="blindspot-banner"></div>
+
+        <div class="telemetry-metrics">
+          <div class="metric-mini">
+            <div class="k">PM2.5 NowCast (12h)</div>
+            <div id="metricNowcast" class="v">--</div>
+          </div>
+          <div class="metric-mini">
+            <div class="k">Độ ẩm RH · Nhiệt độ</div>
+            <div id="metricRhTemp" class="v">--</div>
+          </div>
+          <div class="metric-mini">
+            <div class="k">Tốc độ gió khuếch tán</div>
+            <div id="metricWind" class="v">--</div>
+          </div>
+        </div>
+
+        <div class="calibration-toggle-box">
+          <div>
+            <strong id="kappaLabelText" style="display:block;color:var(--text-primary);">
+              Hiệu chuẩn quang học κ-Köhler (Khử nhiễu sương ẩm ĐBSCL)
+            </strong>
+            <span style="color:var(--text-secondary);font-size:0.75rem;">
+              Petters &amp; Kreidenweis (κ = 0.28) cho cảm biến laser chi phí thấp khi RH &gt; 40%
+            </span>
+          </div>
+          <label class="switch" aria-label="Bật tắt hiệu chuẩn độ ẩm kappa-Kohler">
+            <input type="checkbox" id="kappaToggle" checked />
+            <span class="slider-sw"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Middle Row: 24h Forecast + What-If Policy Simulator & Sensitive Cohort Calculator -->
+    <section class="mid-grid">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="forecastTitle" class="card-title">Dự báo Ngắn hạn 24 Giờ (Harmonic ARX + Dải tin cậy 90% Conformal)</h2>
+            <p id="forecastSub" class="card-subtitle">Mô phỏng kịch bản can thiệp chính sách &amp; hành vi đô thị ngay trên dữ liệu trạm</p>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <canvas id="forecastCanvas"></canvas>
+        </div>
+
+        <div class="scenario-controls">
+          <button type="button" class="scenario-btn active" data-scenario="baseline">
+            <strong>1. Kịch bản Cơ sở (Baseline)</strong>
+            <span>Giữ nguyên cường độ giao thông &amp; tập quán hiện tại</span>
+          </button>
+          <button type="button" class="scenario-btn" data-scenario="no_straw_burn">
+            <strong>2. Thu gom Rơm rạ ĐBSCL (-65% khói đốt đồng)</strong>
+            <span>Ứng dụng chế phẩm vi sinh &amp; kinh tế tuần hoàn nấm rơm</span>
+          </button>
+          <button type="button" class="scenario-btn" data-scenario="green_transit">
+            <strong>3. Hành lang Giao thông Xanh (-38% phát thải giờ cao điểm)</strong>
+            <span>Ưu tiên xe buýt điện, phân luồng xe tải &amp; đi bộ học đường</span>
+          </button>
+          <button type="button" class="scenario-btn" data-scenario="clean_city_combo">
+            <strong>4. Tổ hợp Đô thị Không khí Sạch YDCC 2026</strong>
+            <span>Kết hợp giảm đốt phụ phẩm + giao thông xanh + phun sương công trường</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="doseTitle" class="card-title">Cảnh báo Phơi nhiễm Cá nhân hóa cho Nhóm Nhạy cảm</h2>
+            <p id="doseSub" class="card-subtitle">Tính toán liều hít bụi mịn (µg/giờ) &amp; tìm khung giờ sạch nhất trong ngày</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label id="cohortLbl" class="form-label" for="cohortSelect">1. Đối tượng công dân nhạy cảm</label>
+          <select id="cohortSelect" class="form-select"></select>
+        </div>
+
+        <div class="form-group">
+          <label id="maskLbl" class="form-label" for="maskSelect">2. Cấp bảo vệ khẩu trang hiện có</label>
+          <select id="maskSelect" class="form-select"></select>
+        </div>
+
+        <div class="form-group">
+          <label id="durLbl" class="form-label" for="durationSlider">3. Thời lượng dự kiến ở ngoài trời: 2.5h</label>
+          <input type="range" id="durationSlider" min="0.5" max="10" step="0.5" value="2.5" style="width:100%;accent-color:#18d2ba;min-height:32px;" />
+        </div>
+
+        <div class="dose-results">
+          <div class="dose-box">
+            <div style="font-size:0.74rem;color:var(--text-muted);">Tổng liều PM2.5 hít vào dự kiến</div>
+            <div id="doseInhaledVal" class="big">-- µg</div>
+            <div id="doseBudgetSub" style="font-size:0.74rem;color:var(--text-secondary);margin-top:3px;">--</div>
+          </div>
+          <div class="dose-box">
+            <div style="font-size:0.74rem;color:var(--text-muted);">Ngưỡng giờ ngoài trời an toàn tối đa</div>
+            <div id="doseSafeHoursVal" class="big">-- h</div>
+            <div id="doseSafeHoursSub" style="font-size:0.74rem;color:var(--text-secondary);margin-top:3px;">--</div>
+          </div>
+        </div>
+
+        <div id="cleanWindowCallout" class="clean-window-callout"></div>
+      </div>
+    </section>
+
+    <!-- Bottom Row: Citizen Digital Pulse Form + Live Crowdsourced Feed -->
+    <section class="bottom-grid">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="repFormTitle" class="card-title">Báo cáo Công dân Số (Citizen Air Pulse)</h2>
+            <p id="repFormSub" class="card-subtitle">Đóng góp dữ liệu nguồn phát thải cục bộ (đốt đồng, đốt rác, khói bụi) lên bản đồ chung</p>
+          </div>
+        </div>
+
+        <form id="citizenReportForm">
+          <div class="form-group">
+            <label class="form-label" for="repStationSelect">Khu vực / Trạm lân cận</label>
+            <select id="repStationSelect" class="form-select"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="repLocationInput">Địa điểm cụ thể (Đường, Phường/Xã)</label>
+            <input type="text" id="repLocationInput" class="form-input" placeholder="VD: Đường 3/2, P. Xuân Khánh, Ninh Kiều, Cần Thơ" required />
+          </div>
+
+          <div class="dual-aqi-grid" style="margin-bottom:0;">
+            <div class="form-group">
+              <label class="form-label" for="repSourceSelect">Nguồn ô nhiễm ghi nhận</label>
+              <select id="repSourceSelect" class="form-select">
+                <option value="straw">Đốt rơm rạ sau thu hoạch</option>
+                <option value="waste">Đốt rác thải sinh hoạt tự phát</option>
+                <option value="traffic">Ùn tắc giao thông giờ cao điểm</option>
+                <option value="construction">Bụi công trình xây dựng không che chắn</option>
+                <option value="industrial">Khí thải công nghiệp / Lò gạch gốm</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="repSeveritySelect">Mức độ ảnh hưởng cảm quan</label>
+              <select id="repSeveritySelect" class="form-select">
+                <option value="3">Mức 3/5 — Mùi khét nhẹ, mù mờ</option>
+                <option value="4" selected>Mức 4/5 — Khói dày, cay mắt / khó thở</option>
+                <option value="5">Mức 5/5 — Khẩn cấp, hạn chế tầm nhìn nghiêm trọng</option>
+                <option value="2">Mức 2/5 — Bụi cục bộ thoáng qua</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="repDescInput">Mô tả hiện trường &amp; đối tượng bị ảnh hưởng</label>
+            <textarea id="repDescInput" class="form-textarea" placeholder="Mô tả hướng gió, màu khói, gần trường học/bệnh viện/khu dân cư nào..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;">
+            ⚑ Gửi Báo cáo Công dân Số lên Bản đồ Mở
+          </button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 id="feedTitle" class="card-title">Nhật ký Cảnh báo Cộng đồng Đã Xác thực</h2>
+            <p id="feedSub" class="card-subtitle">Dữ liệu mở chuẩn hóa FAIR sẵn sàng chia sẻ cho Sở TN&amp;MT, trường học &amp; UNDP</p>
+          </div>
+        </div>
+
+        <div id="reportsList" class="report-list"></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>
+        <strong>MekongAir Citizen Pulse</strong> · Phát triển cho cuộc thi <em>UNDP Viet Nam &amp; Government of Japan — Youth Digital Citizen Challenge (YDCC) 2026: “Urban Air-chitects: Designing Healthier Air for Cities”</em>.
+      </div>
+      <div>
+        Chuẩn dữ liệu mở: <code>CC-BY-4.0</code> · Thuật toán: <code>QĐ 1459/QĐ-TCMT</code> + <code>US EPA 2024</code> + <code>κ-Köhler</code> + <code>Conformal ARX</code> · GitHub: <code>DaoHuuTrong2404</code>
+      </div>
+    </footer>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>

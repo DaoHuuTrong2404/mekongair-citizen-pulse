@@ -1,0 +1,764 @@
+:root {
+  /* Atmospheric Civic Observatory — HSL Design System */
+  --bg-deep: hsl(208, 38%, 7%);
+  --bg-canvas: hsl(206, 34%, 10%);
+  --surface-1: hsla(205, 30%, 14%, 0.86);
+  --surface-2: hsla(204, 26%, 18%, 0.92);
+  --surface-3: hsla(203, 24%, 23%, 0.95);
+  --border-subtle: hsla(198, 40%, 75%, 0.11);
+  --border-strong: hsla(174, 72%, 56%, 0.34);
+
+  --text-primary: hsl(200, 30%, 96%);
+  --text-secondary: hsl(202, 18%, 73%);
+  --text-muted: hsl(204, 14%, 54%);
+
+  --brand-cyan: hsl(174, 82%, 47%);
+  --brand-cyan-glow: hsla(174, 82%, 47%, 0.24);
+  --brand-blue: hsl(203, 89%, 56%);
+  --brand-amber: hsl(38, 95%, 56%);
+
+  /* Official AQI Semantic Palette */
+  --aqi-good: hsl(154, 76%, 44%);
+  --aqi-mod: hsl(45, 96%, 53%);
+  --aqi-usg: hsl(27, 96%, 56%);
+  --aqi-unhealthy: hsl(354, 85%, 58%);
+  --aqi-very: hsl(282, 68%, 58%);
+  --aqi-haz: hsl(342, 64%, 38%);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 10px 32px rgba(2, 10, 20, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-glow: 0 6px 24px hsla(174, 82%, 47%, 0.22);
+
+  --font-sans: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 160ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 12% 8%, hsla(174, 82%, 42%, 0.13) 0%, transparent 40%),
+    radial-gradient(circle at 88% 14%, hsla(203, 89%, 48%, 0.12) 0%, transparent 42%),
+    radial-gradient(circle at 50% 92%, hsla(27, 90%, 50%, 0.07) 0%, transparent 45%),
+    linear-gradient(hsla(198, 40%, 75%, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(198, 40%, 75%, 0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+}
+
+/* Top Navigation & Telemetry Header */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: hsla(208, 38%, 8%, 0.84);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 24px;
+}
+
+.topbar-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, hsla(174, 82%, 47%, 0.22), hsla(203, 89%, 56%, 0.22));
+  border: 1px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-glow);
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: hsla(174, 82%, 47%, 0.14);
+  color: var(--brand-cyan);
+  border: 1px solid hsla(174, 82%, 47%, 0.32);
+}
+
+.brand-sub {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px;
+  border-radius: var(--radius-pill);
+  background: hsla(154, 76%, 44%, 0.12);
+  border: 1px solid hsla(154, 76%, 44%, 0.32);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: hsl(154, 80%, 66%);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--aqi-good);
+  box-shadow: 0 0 0 0 hsla(154, 76%, 44%, 0.7);
+  animation: pulseRing 2s infinite;
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 hsla(154, 76%, 44%, 0.7); }
+  70% { box-shadow: 0 0 0 8px hsla(154, 76%, 44%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(154, 76%, 44%, 0); }
+}
+
+.btn, .lang-btn, .chip-btn {
+  min-height: 44px;
+  padding: 8px 15px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.btn:hover, .lang-btn:hover, .chip-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, hsl(174, 80%, 39%), hsl(198, 85%, 43%));
+  border-color: hsla(174, 90%, 70%, 0.45);
+  color: hsl(208, 45%, 7%);
+  font-weight: 700;
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, hsl(174, 82%, 45%), hsl(198, 88%, 49%));
+  color: hsl(208, 45%, 6%);
+}
+
+/* Main Container */
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 24px 56px;
+}
+
+/* UNDP Impact Context Strip */
+.impact-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-tile {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--brand-cyan);
+}
+
+.stat-tile.warn::before { background: var(--brand-amber); }
+.stat-tile.danger::before { background: var(--aqi-unhealthy); }
+
+.stat-kicker {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.stat-val {
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin: 4px 0 2px;
+  color: var(--text-primary);
+}
+
+.stat-desc {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+/* Primary Grid: Map + Station Dual-AQI Inspector */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.card-subtitle {
+  margin: 3px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* Map Box & Region Filter */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.chip-btn {
+  min-height: 38px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  border-radius: var(--radius-pill);
+}
+
+.chip-btn.active {
+  background: hsla(174, 82%, 47%, 0.18);
+  border-color: var(--brand-cyan);
+  color: var(--brand-cyan);
+}
+
+.map-wrap {
+  position: relative;
+  height: 430px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: hsl(207, 42%, 9%);
+}
+
+#leafletMap, #fallbackSvgMap {
+  width: 100%;
+  height: 100%;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 600;
+  background: hsla(208, 38%, 8%, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* Station Selector Strip */
+.station-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+  max-height: 168px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.st-item {
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  min-height: 48px;
+}
+
+.st-item:hover, .st-item.selected {
+  border-color: var(--brand-cyan);
+  background: hsla(174, 82%, 47%, 0.11);
+}
+
+.st-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.st-reg {
+  font-size: 0.69rem;
+  color: var(--text-muted);
+}
+
+.aqi-pill {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #08121a;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Dual-Standard Inspector Panel */
+.dual-aqi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.aqi-gauge-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.gauge-label {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+
+.gauge-num {
+  font-family: var(--font-mono);
+  font-size: 2.35rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 8px 0 4px;
+}
+
+.gauge-cat {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.blindspot-banner {
+  background: linear-gradient(90deg, hsla(27, 96%, 56%, 0.16), hsla(38, 95%, 56%, 0.08));
+  border: 1px solid hsla(27, 96%, 56%, 0.45);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: 0.83rem;
+}
+
+.blindspot-banner.safe {
+  background: hsla(154, 76%, 44%, 0.1);
+  border-color: hsla(154, 76%, 44%, 0.35);
+}
+
+.telemetry-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metric-mini {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.metric-mini .k {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.metric-mini .v {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.calibration-toggle-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  background: hsla(203, 89%, 56%, 0.09);
+  border: 1px solid hsla(203, 89%, 56%, 0.28);
+  border-radius: var(--radius-md);
+  font-size: 0.81rem;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.switch input { opacity: 0; width: 0; height: 0; }
+
+.slider-sw {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--surface-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+}
+
+.slider-sw::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-primary);
+  border-radius: 50%;
+}
+
+.switch input:checked + .slider-sw {
+  background-color: hsla(174, 82%, 47%, 0.35);
+  border-color: var(--brand-cyan);
+}
+
+.switch input:checked + .slider-sw::before {
+  transform: translateX(22px);
+  background-color: var(--brand-cyan);
+}
+
+/* Middle Section: 24h Forecast + Policy Simulator & Sensitive Exposure */
+.mid-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.chart-box {
+  position: relative;
+  width: 100%;
+  height: 290px;
+  background: hsla(208, 40%, 7%, 0.65);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px;
+}
+
+#forecastCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scenario-controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.scenario-btn {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  min-height: 48px;
+  font-family: var(--font-sans);
+}
+
+.scenario-btn.active {
+  background: hsla(154, 76%, 44%, 0.14);
+  border-color: var(--aqi-good);
+}
+
+.scenario-btn strong {
+  display: block;
+  font-size: 0.81rem;
+}
+
+.scenario-btn span {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+/* Sensitive Cohort Exposure Calculator */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.79rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.form-select, .form-input, .form-textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-2);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+}
+
+.form-textarea {
+  min-height: 82px;
+  resize: vertical;
+}
+
+.form-select:focus, .form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 0 3px var(--brand-cyan-glow);
+}
+
+.dose-results {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dose-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.dose-box .big {
+  font-family: var(--font-mono);
+  font-size: 1.32rem;
+  font-weight: 800;
+  color: var(--brand-cyan);
+}
+
+.clean-window-callout {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: hsla(174, 82%, 47%, 0.1);
+  border: 1px solid hsla(174, 82%, 47%, 0.32);
+  font-size: 0.83rem;
+}
+
+/* Citizen Pulse Reporting & Feed */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 18px;
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 410px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.report-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 13px 15px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.report-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.71rem;
+  font-weight: 700;
+  background: hsla(38, 95%, 56%, 0.16);
+  color: var(--brand-amber);
+  border: 1px solid hsla(38, 95%, 56%, 0.35);
+  margin-bottom: 5px;
+}
+
+.upvote-btn {
+  min-height: 44px;
+  min-width: 64px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-3);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.upvote-btn:hover {
+  border-color: var(--brand-cyan);
+  color: var(--brand-cyan);
+}
+
+.footer {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Custom Leaflet Dark Observatory Tiles & Popup Override */
+.osm-dark-tiles {
+  filter: invert(92%) hue-rotate(185deg) brightness(88%) contrast(94%) saturate(85%);
+}
+
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: hsl(206, 34%, 12%) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-strong);
+}
+
+@media (max-width: 1080px) {
+  .impact-strip { grid-template-columns: repeat(2, 1fr); }
+  .hero-grid, .mid-grid, .bottom-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .topbar { padding: 10px 14px; }
+  .container { padding: 14px 14px 40px; }
+  .impact-strip { grid-template-columns: 1fr; }
+  .dual-aqi-grid, .telemetry-metrics, .scenario-controls, .dose-results {
+    grid-template-columns: 1fr;
+  }
+  .map-wrap { height: 320px; }
+}
